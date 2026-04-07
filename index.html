@@ -116,8 +116,8 @@ h1 {
   border: none;
   color: var(--text-dim);
   font-family: var(--sans);
-  font-size: 0.75rem;
-  padding: 7px 10px;
+  font-size: 0.85rem;
+  padding: 8px 10px;
   cursor: pointer;
   text-align: left;
   transition: all 0.2s;
@@ -288,12 +288,11 @@ h1 {
 
 /* Readout panels */
 .panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 6px;
   flex: 1;
   min-height: 0;
-  align-content: start;
 }
 .panel {
   background: var(--bg2);
@@ -302,9 +301,6 @@ h1 {
   padding: 8px 10px;
   position: relative;
   overflow: hidden;
-}
-.panel.wide {
-  grid-column: 1 / -1;
 }
 .panel::before {
   content: '';
@@ -380,7 +376,7 @@ h1 {
 
   <!-- Readout panels -->
   <div class="panels">
-    <div class="panel wide">
+    <div class="panel">
       <div class="panel-title">Hyperfocale afstand</div>
       <div class="panel-line" id="hyper1"></div>
       <div class="panel-line" id="hyper2"></div>
