@@ -19,7 +19,6 @@
   --bg3: #242424;
   --amber: #c8922a;
   --amber-dim: #8a6520;
-  --amber-glow: rgba(200,146,42,0.15);
   --text: #e8e0d4;
   --text-dim: #8a8278;
   --mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Menlo', 'Consolas', monospace;
@@ -61,7 +60,7 @@ h1 {
   flex-shrink: 0;
 }
 
-/* Selector pills */
+/* Selector group */
 .selector-group { margin-bottom: 8px; flex-shrink: 0; }
 .selector-label {
   font-size: 0.6rem;
@@ -70,36 +69,8 @@ h1 {
   color: var(--text-dim);
   margin-bottom: 4px;
 }
-.pill-row {
-  display: flex;
-  gap: 0;
-  background: var(--bg2);
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid #2a2a2a;
-}
-.pill-btn {
-  flex: 1;
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  font-family: var(--sans);
-  font-size: 0.78rem;
-  padding: 7px 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.pill-btn.active {
-  background: var(--bg3);
-  color: var(--amber);
-  box-shadow: inset 0 0 0 1px var(--amber-dim);
-}
 
-/* Lens selector as scrollable list */
+/* Lens selector */
 .lens-list {
   display: flex;
   flex-direction: column;
@@ -180,25 +151,28 @@ h1 {
   cursor: pointer;
 }
 
-/* Horizontal aperture strip */
-.wheel-section {
-  margin: 10px 0 8px;
+/* Horizontal strips (aperture + distance) */
+.strip-section {
+  margin: 6px 0;
   flex-shrink: 0;
 }
-.aperture-display {
-  text-align: center;
-  margin-bottom: 6px;
+.strip-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 4px;
 }
-.aperture-value {
+.strip-value {
   font-family: var(--mono);
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: var(--amber);
   font-weight: 600;
 }
-.aperture-label {
-  font-size: 0.6rem;
+.strip-label {
+  font-size: 0.55rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   color: var(--text-dim);
 }
 .strip-row {
@@ -210,7 +184,7 @@ h1 {
   flex: 1;
   overflow: hidden;
   position: relative;
-  height: 52px;
+  height: 46px;
   touch-action: none;
 }
 .strip-track {
@@ -234,29 +208,29 @@ h1 {
 }
 .strip-tick {
   width: 2px;
-  height: 18px;
+  height: 16px;
   background: var(--text-dim);
   border-radius: 1px;
   transition: all 0.15s;
 }
 .strip-stop.active .strip-tick {
   background: var(--amber);
-  height: 24px;
+  height: 22px;
   width: 3px;
 }
 .strip-stop-label {
   font-family: var(--mono);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text-dim);
-  margin-top: 3px;
+  margin-top: 2px;
   transition: all 0.15s;
+  white-space: nowrap;
 }
 .strip-stop.active .strip-stop-label {
   color: var(--amber);
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
 }
-/* Center indicator line */
 .strip-container::before {
   content: '';
   position: absolute;
@@ -270,8 +244,8 @@ h1 {
   transform: translateX(-50%);
 }
 .arrow-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: 1px solid #2a2a2a;
   background: var(--bg2);
@@ -290,7 +264,7 @@ h1 {
 .panels {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   flex: 1;
   min-height: 0;
 }
@@ -298,7 +272,7 @@ h1 {
   background: var(--bg2);
   border-radius: var(--radius);
   border: 1px solid #2a2a2a;
-  padding: 8px 10px;
+  padding: 7px 10px;
   position: relative;
   overflow: hidden;
 }
@@ -314,13 +288,13 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-dim);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 .panel-line {
   font-family: var(--mono);
   font-size: 0.8rem;
   color: var(--text);
-  margin-bottom: 2px;
+  margin-bottom: 1px;
   transition: opacity 0.3s;
 }
 .panel-line .val {
@@ -328,7 +302,6 @@ h1 {
   font-weight: 600;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
@@ -337,12 +310,6 @@ h1 {
 <body>
 <div class="container">
   <h1>Scherptediepte</h1>
-
-  <!-- Camera body selector -->
-  <div class="selector-group">
-    <div class="selector-label">Camera</div>
-    <div class="pill-row" id="bodySelector"></div>
-  </div>
 
   <!-- Lens selector -->
   <div class="selector-group">
@@ -359,18 +326,33 @@ h1 {
     <input type="range" class="zoom-slider" id="zoomSlider">
   </div>
 
-  <!-- Aperture horizontal strip -->
-  <div class="wheel-section">
-    <div class="aperture-display">
-      <div class="aperture-value" id="apertureValue">f/4</div>
-      <div class="aperture-label">diafragma</div>
+  <!-- Aperture strip -->
+  <div class="strip-section">
+    <div class="strip-header">
+      <span class="strip-value" id="apertureValue">f/4</span>
+      <span class="strip-label">diafragma</span>
     </div>
     <div class="strip-row">
-      <button class="arrow-btn" id="arrowLeft">‹</button>
-      <div class="strip-container" id="stripContainer">
-        <div class="strip-track" id="stripTrack"></div>
+      <button class="arrow-btn" id="apLeft">‹</button>
+      <div class="strip-container" id="apContainer">
+        <div class="strip-track" id="apTrack"></div>
       </div>
-      <button class="arrow-btn" id="arrowRight">›</button>
+      <button class="arrow-btn" id="apRight">›</button>
+    </div>
+  </div>
+
+  <!-- Focus distance strip -->
+  <div class="strip-section">
+    <div class="strip-header">
+      <span class="strip-value" id="distValue">5.0 m</span>
+      <span class="strip-label">scherpstelafstand</span>
+    </div>
+    <div class="strip-row">
+      <button class="arrow-btn" id="distLeft">‹</button>
+      <div class="strip-container" id="distContainer">
+        <div class="strip-track" id="distTrack"></div>
+      </div>
+      <button class="arrow-btn" id="distRight">›</button>
     </div>
   </div>
 
@@ -380,6 +362,10 @@ h1 {
       <div class="panel-title">Hyperfocale afstand</div>
       <div class="panel-line" id="hyper1"></div>
       <div class="panel-line" id="hyper2"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title" id="customTitle">Scherpstelling op 5.0 m</div>
+      <div class="panel-line" id="focusCustom"></div>
     </div>
     <div class="panel">
       <div class="panel-title">Scherpstelling 5 m</div>
@@ -397,80 +383,50 @@ h1 {
 </div>
 
 <script>
-// ── Data ──
+const COC = 0.030;
 const ALL_STOPS = [1.0, 1.2, 1.4, 1.8, 2.0, 2.8, 4, 5.6, 8, 11, 16, 22];
+const DIST_STOPS = [0.3, 0.5, 0.7, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30, 50, 100];
+const STOP_WIDTH = 48;
 
-const bodies = [
-  { name: 'Nikon Z6 III', coc: 0.030 },
-  { name: 'Nikon D700', coc: 0.030 }
+const allLenses = [
+  { name: 'Laowa 11mm f/4', mount: 'Z', focal: 11, maxAp: 4 },
+  { name: 'Nikkor Z 24–120mm f/4', mount: 'Z', focal: [24,120], maxAp: 4 },
+  { name: 'Nikkor Z 100–400mm f/4.5–5.6', mount: 'Z', focal: [100,400], maxAp: [4.5, 6.3] },
+  { name: 'Orestegon 29mm f/2.8', mount: 'M42', focal: 29, maxAp: 2.8 },
+  { name: 'Nikkor 35mm f/1.4G', mount: 'F', focal: 35, maxAp: 1.4 },
+  { name: 'Nikkor 35mm f/2 AI', mount: 'F', focal: 35, maxAp: 2.0 },
+  { name: 'Nikkor 50mm f/1.4 AI', mount: 'F', focal: 50, maxAp: 1.4 },
+  { name: 'Nikkor 85mm f/2 AI', mount: 'F', focal: 85, maxAp: 2.0 },
 ];
 
-const lenses = {
-  'Nikon Z6 III': [
-    { name: 'Laowa 11mm f/4', mount: 'Z', focal: 11, maxAp: 4 },
-    { name: 'Nikkor Z 24–120mm f/4', mount: 'Z', focal: [24,120], maxAp: 4 },
-    { name: 'Nikkor Z 100–400mm f/4.5–5.6', mount: 'Z', focal: [100,400], maxAp: [4.5, 6.3] },
-    { name: 'Nikkor 35mm f/1.4G', mount: 'F', focal: 35, maxAp: 1.4 },
-    { name: 'Nikkor 35mm f/2 AI', mount: 'F', focal: 35, maxAp: 2.0 },
-    { name: 'Nikkor 50mm f/1.4 AI', mount: 'F', focal: 50, maxAp: 1.4 },
-    { name: 'Nikkor 85mm f/2 AI', mount: 'F', focal: 85, maxAp: 2.0 },
-    { name: 'Orestegon 29mm f/2.8', mount: 'M42', focal: 29, maxAp: 2.8 }
-  ],
-  'Nikon D700': [
-    { name: 'Nikkor 35mm f/1.4G', mount: 'F', focal: 35, maxAp: 1.4 },
-    { name: 'Nikkor 35mm f/2 AI', mount: 'F', focal: 35, maxAp: 2.0 },
-    { name: 'Nikkor 50mm f/1.4 AI', mount: 'F', focal: 50, maxAp: 1.4 },
-    { name: 'Nikkor 85mm f/2 AI', mount: 'F', focal: 85, maxAp: 2.0 }
-  ]
-};
-
-// ── State ──
-let currentBody = 0;
 let currentLens = 0;
 let currentStopIndex = 0;
+let currentDistIndex = 5; // 2m
 let availableStops = [];
 let currentFocal = 0;
 let currentMaxAp = 0;
-let dragXStart = null;
-let dragStopStart = null;
-const STOP_WIDTH = 48;
 
 // ── DOM refs ──
-const bodySelector = document.getElementById('bodySelector');
 const lensSelector = document.getElementById('lensSelector');
 const zoomContainer = document.getElementById('zoomContainer');
 const zoomSlider = document.getElementById('zoomSlider');
 const zoomValue = document.getElementById('zoomValue');
-const stripContainer = document.getElementById('stripContainer');
-const stripTrack = document.getElementById('stripTrack');
+const apContainer = document.getElementById('apContainer');
+const apTrack = document.getElementById('apTrack');
 const apertureValue = document.getElementById('apertureValue');
+const distContainer = document.getElementById('distContainer');
+const distTrack = document.getElementById('distTrack');
+const distValue = document.getElementById('distValue');
 
 // ── Init ──
 function init() {
-  renderBodies();
-  selectBody(0);
-}
-
-function renderBodies() {
-  bodySelector.innerHTML = bodies.map((b, i) =>
-    `<button class="pill-btn${i === currentBody ? ' active' : ''}" data-i="${i}">${b.name}</button>`
-  ).join('');
-  bodySelector.querySelectorAll('.pill-btn').forEach(btn => {
-    btn.addEventListener('click', () => selectBody(+btn.dataset.i));
-  });
-}
-
-function selectBody(i) {
-  currentBody = i;
-  bodySelector.querySelectorAll('.pill-btn').forEach((b, j) => b.classList.toggle('active', j === i));
-  currentLens = 0;
   renderLenses();
   selectLens(0);
+  renderDistStrip();
 }
 
 function renderLenses() {
-  const list = lenses[bodies[currentBody].name];
-  lensSelector.innerHTML = list.map((l, i) =>
+  lensSelector.innerHTML = allLenses.map((l, i) =>
     `<button class="lens-btn${i === currentLens ? ' active' : ''}" data-i="${i}">
       <span>${l.name}</span>
       <span class="mount-tag">${l.mount}</span>
@@ -484,7 +440,7 @@ function renderLenses() {
 function selectLens(i) {
   currentLens = i;
   lensSelector.querySelectorAll('.lens-btn').forEach((b, j) => b.classList.toggle('active', j === i));
-  const lens = lenses[bodies[currentBody].name][i];
+  const lens = allLenses[i];
   const isZoom = Array.isArray(lens.focal);
 
   if (isZoom) {
@@ -501,12 +457,12 @@ function selectLens(i) {
 
   updateMaxAperture();
   updateAvailableStops();
-  renderStrip();
+  renderApStrip();
   calculate();
 }
 
 function updateMaxAperture() {
-  const lens = lenses[bodies[currentBody].name][currentLens];
+  const lens = allLenses[currentLens];
   if (Array.isArray(lens.maxAp)) {
     const [fMin, fMax] = lens.focal;
     const [apMin, apMax] = lens.maxAp;
@@ -527,131 +483,226 @@ function updateAvailableStops() {
   if (currentStopIndex < 0) currentStopIndex = 0;
 }
 
-// Zoom slider
 zoomSlider.addEventListener('input', () => {
   currentFocal = +zoomSlider.value;
   updateZoomDisplay();
   updateMaxAperture();
   updateAvailableStops();
-  renderStrip();
+  renderApStrip();
   calculate();
 });
 
-// ── Horizontal Aperture Strip ──
-function renderStrip() {
-  stripTrack.innerHTML = availableStops.map((stop, i) => {
-    const label = stop % 1 === 0 ? stop : stop.toFixed(1);
-    return `<div class="strip-stop${i === currentStopIndex ? ' active' : ''}" data-i="${i}">
+// ── Generic strip helper ──
+function setupStrip(container, track, stops, getIndex, setIndex, formatLabel, formatValue, valueEl, onUpdate) {
+  function render() {
+    const idx = getIndex();
+    track.innerHTML = stops.map((s, i) => {
+      const label = formatLabel(s);
+      return `<div class="strip-stop${i === idx ? ' active' : ''}" data-i="${i}">
+        <div class="strip-tick"></div>
+        <div class="strip-stop-label">${label}</div>
+      </div>`;
+    }).join('');
+    track.querySelectorAll('.strip-stop').forEach(el => {
+      el.addEventListener('click', () => { setIndex(+el.dataset.i); render(); onUpdate(); });
+    });
+    updatePos(false);
+    valueEl.textContent = formatValue(stops[idx]);
+  }
+
+  function updatePos(animate) {
+    const w = container.offsetWidth;
+    const offset = w / 2 - getIndex() * STOP_WIDTH - STOP_WIDTH / 2;
+    track.style.transition = animate ? 'transform 0.15s ease-out' : 'none';
+    track.style.transform = `translateX(${offset}px)`;
+  }
+
+  // Drag
+  let dragX = null, dragStart = null;
+  function getX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+
+  container.addEventListener('mousedown', onStart);
+  container.addEventListener('touchstart', onStart, { passive: false });
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('touchmove', onMove, { passive: false });
+  window.addEventListener('mouseup', onEnd);
+  window.addEventListener('touchend', onEnd);
+
+  function onStart(e) { dragX = getX(e); dragStart = getIndex(); track.style.transition = 'none'; e.preventDefault(); }
+  function onMove(e) {
+    if (dragX === null) return;
+    const dx = getX(e) - dragX;
+    const steps = Math.round(-dx / STOP_WIDTH);
+    let ni = Math.max(0, Math.min(stops.length - 1, dragStart + steps));
+    if (ni !== getIndex()) {
+      setIndex(ni);
+      track.querySelectorAll('.strip-stop').forEach((s, i) => s.classList.toggle('active', i === ni));
+      updatePos(false);
+      valueEl.textContent = formatValue(stops[ni]);
+      onUpdate();
+    }
+    e.preventDefault();
+  }
+  function onEnd() { if (dragX !== null) updatePos(true); dragX = null; dragStart = null; }
+
+  return { render, updatePos };
+}
+
+// ── Aperture strip ──
+const apStrip = setupStrip(
+  apContainer, apTrack,
+  [], // placeholder, replaced on render
+  () => currentStopIndex,
+  i => { currentStopIndex = i; },
+  s => s % 1 === 0 ? s : s.toFixed(1),
+  s => s % 1 === 0 ? `f/${s}` : `f/${s.toFixed(1)}`,
+  apertureValue,
+  calculate
+);
+
+function renderApStrip() {
+  // Re-create with current available stops
+  const idx = currentStopIndex;
+  apTrack.innerHTML = availableStops.map((s, i) => {
+    const label = s % 1 === 0 ? s : s.toFixed(1);
+    return `<div class="strip-stop${i === idx ? ' active' : ''}" data-i="${i}">
       <div class="strip-tick"></div>
       <div class="strip-stop-label">${label}</div>
     </div>`;
   }).join('');
-
-  // Click on stops
-  stripTrack.querySelectorAll('.strip-stop').forEach(el => {
+  apTrack.querySelectorAll('.strip-stop').forEach(el => {
     el.addEventListener('click', () => {
       currentStopIndex = +el.dataset.i;
-      renderStrip();
+      renderApStrip();
       calculate();
     });
   });
-
-  updateStripPosition(false);
-  updateApertureDisplay();
+  updateApPos(false);
+  const v = availableStops[currentStopIndex];
+  apertureValue.textContent = v % 1 === 0 ? `f/${v}` : `f/${v.toFixed(1)}`;
 }
 
-function updateStripPosition(animate) {
-  const containerWidth = stripContainer.offsetWidth;
-  const offset = containerWidth / 2 - currentStopIndex * STOP_WIDTH - STOP_WIDTH / 2;
-  stripTrack.style.transition = animate ? 'transform 0.15s ease-out' : 'none';
-  stripTrack.style.transform = `translateX(${offset}px)`;
+function updateApPos(animate) {
+  const w = apContainer.offsetWidth;
+  const offset = w / 2 - currentStopIndex * STOP_WIDTH - STOP_WIDTH / 2;
+  apTrack.style.transition = animate ? 'transform 0.15s ease-out' : 'none';
+  apTrack.style.transform = `translateX(${offset}px)`;
 }
 
-function updateApertureDisplay() {
-  const apVal = availableStops[currentStopIndex];
-  apertureValue.textContent = apVal % 1 === 0 ? `f/${apVal}` : `f/${apVal.toFixed(1)}`;
-}
-
-// Arrow buttons
-document.getElementById('arrowLeft').addEventListener('click', () => {
-  if (currentStopIndex > 0) {
-    currentStopIndex--;
-    renderStrip();
-    updateStripPosition(true);
-    calculate();
-  }
+// Aperture arrows
+document.getElementById('apLeft').addEventListener('click', () => {
+  if (currentStopIndex > 0) { currentStopIndex--; renderApStrip(); updateApPos(true); calculate(); }
 });
-document.getElementById('arrowRight').addEventListener('click', () => {
-  if (currentStopIndex < availableStops.length - 1) {
-    currentStopIndex++;
-    renderStrip();
-    updateStripPosition(true);
-    calculate();
-  }
+document.getElementById('apRight').addEventListener('click', () => {
+  if (currentStopIndex < availableStops.length - 1) { currentStopIndex++; renderApStrip(); updateApPos(true); calculate(); }
 });
 
-// Touch/mouse drag on strip
+// Aperture drag
 (function() {
-  const el = stripContainer;
-
-  function getX(e) {
-    return e.touches ? e.touches[0].clientX : e.clientX;
-  }
-
-  function onStart(e) {
-    dragXStart = getX(e);
-    dragStopStart = currentStopIndex;
-    stripTrack.style.transition = 'none';
-    e.preventDefault();
-  }
-
+  let dragX = null, dragStart = null;
+  function getX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+  apContainer.addEventListener('mousedown', e => { dragX = getX(e); dragStart = currentStopIndex; apTrack.style.transition = 'none'; e.preventDefault(); });
+  apContainer.addEventListener('touchstart', e => { dragX = getX(e); dragStart = currentStopIndex; apTrack.style.transition = 'none'; e.preventDefault(); }, { passive: false });
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('touchmove', onMove, { passive: false });
   function onMove(e) {
-    if (dragXStart === null) return;
-    const dx = getX(e) - dragXStart;
-    const stepsChange = Math.round(-dx / STOP_WIDTH);
-    let newIndex = dragStopStart + stepsChange;
-    newIndex = Math.max(0, Math.min(availableStops.length - 1, newIndex));
-
-    if (newIndex !== currentStopIndex) {
-      currentStopIndex = newIndex;
-      // Update active classes
-      stripTrack.querySelectorAll('.strip-stop').forEach((s, i) => s.classList.toggle('active', i === currentStopIndex));
-      updateStripPosition(false);
-      updateApertureDisplay();
+    if (dragX === null) return;
+    const dx = getX(e) - dragX;
+    let ni = Math.max(0, Math.min(availableStops.length - 1, dragStart + Math.round(-dx / STOP_WIDTH)));
+    if (ni !== currentStopIndex) {
+      currentStopIndex = ni;
+      apTrack.querySelectorAll('.strip-stop').forEach((s, i) => s.classList.toggle('active', i === ni));
+      updateApPos(false);
+      const v = availableStops[ni];
+      apertureValue.textContent = v % 1 === 0 ? `f/${v}` : `f/${v.toFixed(1)}`;
       calculate();
     }
     e.preventDefault();
   }
+  function onEnd() { if (dragX !== null) updateApPos(true); dragX = null; }
+  window.addEventListener('mouseup', onEnd);
+  window.addEventListener('touchend', onEnd);
+})();
 
-  function onEnd() {
-    if (dragXStart !== null) {
-      updateStripPosition(true);
-    }
-    dragXStart = null;
-    dragStopStart = null;
-  }
+// ── Distance strip ──
+function formatDist(d) { return d >= 1 ? (d % 1 === 0 ? d + '' : d.toFixed(1)) : d.toFixed(1); }
+function formatDistValue(d) { return formatDist(d) + ' m'; }
 
-  el.addEventListener('mousedown', onStart);
-  el.addEventListener('touchstart', onStart, { passive: false });
+function renderDistStrip() {
+  const idx = currentDistIndex;
+  distTrack.innerHTML = DIST_STOPS.map((d, i) => {
+    return `<div class="strip-stop${i === idx ? ' active' : ''}" data-i="${i}">
+      <div class="strip-tick"></div>
+      <div class="strip-stop-label">${formatDist(d)}</div>
+    </div>`;
+  }).join('');
+  distTrack.querySelectorAll('.strip-stop').forEach(el => {
+    el.addEventListener('click', () => {
+      currentDistIndex = +el.dataset.i;
+      renderDistStrip();
+      calculate();
+    });
+  });
+  updateDistPos(false);
+  distValue.textContent = formatDistValue(DIST_STOPS[currentDistIndex]);
+}
+
+function updateDistPos(animate) {
+  const w = distContainer.offsetWidth;
+  const offset = w / 2 - currentDistIndex * STOP_WIDTH - STOP_WIDTH / 2;
+  distTrack.style.transition = animate ? 'transform 0.15s ease-out' : 'none';
+  distTrack.style.transform = `translateX(${offset}px)`;
+}
+
+// Distance arrows
+document.getElementById('distLeft').addEventListener('click', () => {
+  if (currentDistIndex > 0) { currentDistIndex--; renderDistStrip(); updateDistPos(true); calculate(); }
+});
+document.getElementById('distRight').addEventListener('click', () => {
+  if (currentDistIndex < DIST_STOPS.length - 1) { currentDistIndex++; renderDistStrip(); updateDistPos(true); calculate(); }
+});
+
+// Distance drag
+(function() {
+  let dragX = null, dragStart = null;
+  function getX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+  distContainer.addEventListener('mousedown', e => { dragX = getX(e); dragStart = currentDistIndex; distTrack.style.transition = 'none'; e.preventDefault(); });
+  distContainer.addEventListener('touchstart', e => { dragX = getX(e); dragStart = currentDistIndex; distTrack.style.transition = 'none'; e.preventDefault(); }, { passive: false });
   window.addEventListener('mousemove', onMove);
   window.addEventListener('touchmove', onMove, { passive: false });
+  function onMove(e) {
+    if (dragX === null) return;
+    const dx = getX(e) - dragX;
+    let ni = Math.max(0, Math.min(DIST_STOPS.length - 1, dragStart + Math.round(-dx / STOP_WIDTH)));
+    if (ni !== currentDistIndex) {
+      currentDistIndex = ni;
+      distTrack.querySelectorAll('.strip-stop').forEach((s, i) => s.classList.toggle('active', i === ni));
+      updateDistPos(false);
+      distValue.textContent = formatDistValue(DIST_STOPS[ni]);
+      calculate();
+    }
+    e.preventDefault();
+  }
+  function onEnd() { if (dragX !== null) updateDistPos(true); dragX = null; }
   window.addEventListener('mouseup', onEnd);
   window.addEventListener('touchend', onEnd);
 })();
 
 // ── DOF Calculations ──
 function calculate() {
-  const coc = bodies[currentBody].coc;
   const f = currentFocal;
   const N = availableStops[currentStopIndex];
-
-  const H_mm = (f * f) / (N * coc) + f;
+  const H_mm = (f * f) / (N * COC) + f;
   const H = H_mm / 1000;
 
   document.getElementById('hyper1').innerHTML =
     `Stel scherp op <span class="val">${H.toFixed(2)} m</span>`;
   document.getElementById('hyper2').innerHTML =
     `Scherp van <span class="val">${(H / 2).toFixed(2)} m</span> tot <span class="val">∞</span>`;
+
+  const customDist = DIST_STOPS[currentDistIndex];
+  document.getElementById('customTitle').textContent = `Scherpstelling op ${formatDistValue(customDist)}`;
+  document.getElementById('focusCustom').innerHTML = dofLine(H, customDist);
 
   document.getElementById('focus5').innerHTML = dofLine(H, 5);
   document.getElementById('focus2').innerHTML = dofLine(H, 2);
@@ -667,7 +718,7 @@ function dofLine(H, d) {
     const farVal = (H * d) / (H - d);
     far = farVal >= H ? '∞' : farVal.toFixed(2) + ' m';
   }
-  return `<span class="val">${near.toFixed(2)}</span> – <span class="val">${far}</span>`;
+  return `<span class="val">${near.toFixed(2)} m</span> – <span class="val">${far}</span>`;
 }
 
 // ── Service Worker ──
@@ -677,8 +728,7 @@ if ('serviceWorker' in navigator) {
 
 // ── Start ──
 init();
-// Recalculate strip position after layout settles
-requestAnimationFrame(() => updateStripPosition(false));
+requestAnimationFrame(() => { updateApPos(false); updateDistPos(false); });
 </script>
 </body>
 </html>
