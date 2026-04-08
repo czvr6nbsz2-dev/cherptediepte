@@ -367,25 +367,13 @@ h1 {
       <div class="panel-title" id="customTitle">Scherpstelling op 5.0 m</div>
       <div class="panel-line" id="focusCustom"></div>
     </div>
-    <div class="panel">
-      <div class="panel-title">Scherpstelling 5 m</div>
-      <div class="panel-line" id="focus5"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Scherpstelling 2 m</div>
-      <div class="panel-line" id="focus2"></div>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Scherpstelling 1 m</div>
-      <div class="panel-line" id="focus1"></div>
-    </div>
   </div>
 </div>
 
 <script>
 const COC = 0.030;
 const ALL_STOPS = [1.0, 1.2, 1.4, 1.8, 2.0, 2.8, 4, 5.6, 8, 11, 16, 22];
-const DIST_STOPS = [0.3, 0.5, 0.7, 1, 1.5, 2, 3, 5, 7, 10, 15, 20, 30, 50, 100];
+const DIST_STOPS = [0.3, 0.5, 0.7, 1, 1.5, 2, 2.5, 3, 5, 7, 10, 15, 20, 30, 50, 100];
 const STOP_WIDTH = 48;
 
 const allLenses = [
@@ -704,9 +692,6 @@ function calculate() {
   document.getElementById('customTitle').textContent = `Scherpstelling op ${formatDistValue(customDist)}`;
   document.getElementById('focusCustom').innerHTML = dofLine(H, customDist);
 
-  document.getElementById('focus5').innerHTML = dofLine(H, 5);
-  document.getElementById('focus2').innerHTML = dofLine(H, 2);
-  document.getElementById('focus1').innerHTML = dofLine(H, 1);
 }
 
 function dofLine(H, d) {
