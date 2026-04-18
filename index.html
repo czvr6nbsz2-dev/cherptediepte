@@ -471,11 +471,14 @@ html, body {
 <script>
 // ── Constants ──
 const COC = 0.030;
-const ALL_STOPS = [1.0, 1.2, 1.4, 1.8, 2.0, 2.8, 4, 5.6, 8, 11, 16, 22];
+// Apertures in 1/3 stops from f/1.0 to f/22
+const ALL_STOPS = [1.0, 1.1, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.5, 2.8, 3.2, 3.5, 4.0, 4.5, 5.0, 5.6, 6.3, 7.1, 8.0, 9.0, 10, 11, 13, 14, 16, 18, 20, 22];
 const DIST_STOPS = [0.3, 0.5, 0.7, 1, 1.5, 2, 2.5, 3, 5, 7, 10, 15, 20, 30, 50, 100];
-const ISO_STOPS = [50, 100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600];
+// ISO in 1/3 stops
+const ISO_STOPS = [50, 64, 80, 100, 125, 160, 200, 250, 320, 400, 500, 640, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6400, 8000, 10000, 12800, 16000, 20000, 25600];
+// EV in 1/3 stops from -2 to 20
 const EV_STOPS = [];
-for (let i = -2; i <= 20; i++) EV_STOPS.push(i);
+for (let i = -6; i <= 60; i++) EV_STOPS.push(Math.round((i / 3) * 10) / 10);
 const STOP_WIDTH = 48;
 
 const allLenses = [
@@ -490,15 +493,16 @@ const allLenses = [
 ];
 
 // ── State (with localStorage persistence) ──
+const STATE_KEY = 'scd_state_v2';
 function loadState() {
   try {
-    const s = JSON.parse(localStorage.getItem('scd_state'));
+    const s = JSON.parse(localStorage.getItem(STATE_KEY));
     if (s) return s;
   } catch(e) {}
   return {};
 }
 function saveState() {
-  localStorage.setItem('scd_state', JSON.stringify({
+  localStorage.setItem(STATE_KEY, JSON.stringify({
     tab: activeTab,
     lens: currentLens,
     apIdx: currentStopIndex,
@@ -511,18 +515,23 @@ function saveState() {
 }
 const saved = loadState();
 
+// Default indices for new arrays
+const DEFAULT_AP_IDX = ALL_STOPS.indexOf(4.0);     // f/4
+const DEFAULT_ISO_IDX = ISO_STOPS.indexOf(100);    // ISO 100
+const DEFAULT_EV_IDX = EV_STOPS.indexOf(10);       // EV 10
+
 let activeTab = saved.tab || 'dof';
 let currentLens = saved.lens ?? 0;
-let currentStopIndex = saved.apIdx ?? 0;
+let currentStopIndex = saved.apIdx ?? DEFAULT_AP_IDX;
 let currentDistIndex = saved.distIdx ?? 5;
 let currentFocal = saved.zoom ?? 0;
 let currentMaxAp = 0;
 let availableStops = [];
 
 // Light meter state
-let mApIndex = saved.mApIdx ?? 6; // f/4
-let isoIndex = saved.isoIdx ?? 1; // ISO 100
-let evIndex = saved.evIdx ?? 12;  // EV 10
+let mApIndex = saved.mApIdx ?? DEFAULT_AP_IDX;
+let isoIndex = saved.isoIdx ?? DEFAULT_ISO_IDX;
+let evIndex = saved.evIdx ?? DEFAULT_EV_IDX;
 
 // ── Tabs ──
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -794,18 +803,21 @@ makeDraggable(isoContainer, isoTrack, () => isoIndex, i => { isoIndex = i; }, ()
 makeArrows('isoLeft', 'isoRight', () => isoIndex, i => { isoIndex = i; }, () => ISO_STOPS.length,
   () => { renderIsoStrip(); updateIsoPos(true); calcMeter(); saveState(); });
 
+function formatEv(v) {
+  return Number.isInteger(v) ? v.toString() : v.toFixed(1);
+}
 function renderEvStrip() {
   evTrack.innerHTML = EV_STOPS.map((s, i) =>
     `<div class="strip-stop${i === evIndex ? ' active' : ''}" data-i="${i}">
       <div class="strip-tick"></div>
-      <div class="strip-stop-label">${s}</div>
+      <div class="strip-stop-label">${formatEv(s)}</div>
     </div>`
   ).join('');
   evTrack.querySelectorAll('.strip-stop').forEach(el => {
     el.addEventListener('click', () => { evIndex = +el.dataset.i; renderEvStrip(); calcMeter(); saveState(); });
   });
   updateEvPos(false);
-  evValueEl.textContent = `EV ${EV_STOPS[evIndex]}`;
+  evValueEl.textContent = `EV ${formatEv(EV_STOPS[evIndex])}`;
 }
 function updateEvPos(animate) {
   const w = evContainer.offsetWidth;
@@ -829,24 +841,37 @@ function calcMeter() {
 }
 
 function formatShutter(t) {
-  if (t >= 60) {
-    const m = Math.floor(t / 60);
-    const s = Math.round(t % 60);
+  // Snap to nearest 1/3 stop shutter speed, then format using standard notation.
+  const tv = -Math.log2(t);
+  const tvR = Math.round(tv * 3) / 3;
+  const tR = Math.pow(2, -tvR);
+
+  if (tR >= 60) {
+    const m = Math.floor(tR / 60);
+    const s = Math.round(tR % 60);
     return s > 0 ? `${m}m ${s}s` : `${m} min`;
   }
-  if (t >= 1) return t < 10 ? t.toFixed(1) + ' s' : Math.round(t) + ' s';
-  const inv = 1 / t;
-  // Snap to nearest standard shutter speed
-  const standards = [2, 4, 8, 15, 30, 60, 125, 250, 500, 1000, 2000, 4000, 8000];
-  let best = standards[0];
-  let bestDist = Math.abs(inv - best);
-  for (const s of standards) {
-    const d = Math.abs(inv - s);
-    if (d < bestDist) { best = s; bestDist = d; }
+
+  if (tR >= 1) {
+    // Standard long exposures in 1/3 stops
+    const longStd = [1, 1.3, 1.6, 2, 2.5, 3, 4, 5, 6, 8, 10, 13, 15, 20, 25, 30, 40, 50, 60];
+    let best = longStd[0], bd = Math.abs(tR - best);
+    for (const s of longStd) {
+      const d = Math.abs(tR - s);
+      if (d < bd) { best = s; bd = d; }
+    }
+    return `${best}"`;
   }
-  // Only snap if within ~1/3 stop
-  if (bestDist / inv < 0.3) return `1/${best}`;
-  return `1/${Math.round(inv)}`;
+
+  // Fast shutter: snap to standard 1/3-stop reciprocal values
+  const inv = 1 / tR;
+  const fastStd = [2, 2.5, 3, 4, 5, 6, 8, 10, 13, 15, 20, 25, 30, 40, 50, 60, 80, 100, 125, 160, 200, 250, 320, 400, 500, 640, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6400, 8000];
+  let best = fastStd[0], bd = Math.abs(inv - best);
+  for (const s of fastStd) {
+    const d = Math.abs(inv - s);
+    if (d < bd) { best = s; bd = d; }
+  }
+  return `1/${best}`;
 }
 
 // ── Shared drag/arrow helpers ──
